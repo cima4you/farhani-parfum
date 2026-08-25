@@ -1,4 +1,5 @@
-import { initDB, getOrders, createOrder, updateOrderStatus, deleteOrder } from '../lib/turso.js';
+import { initDB, getOrders, createOrder } from '../lib/turso.js';
+import client from '../lib/turso.js';
 
 export default async function handler(req, res) {
   await initDB();
@@ -14,14 +15,22 @@ export default async function handler(req, res) {
     }
     case 'PATCH': {
       const { id, status } = req.body;
-      const orderId = typeof id === 'number' ? id.toFixed(1) : String(id);
-      await updateOrderStatus(orderId, status);
+      const sid = String(id).replace(/\.0$/, '');
+      const rows = await client.execute('SELECT id FROM orders');
+      const match = rows.rows.find(r => String(r.id).replace(/\.0$/, '') === sid);
+      if (match) {
+        await client.execute('UPDATE orders SET status = ? WHERE id = ?', [status, match.id]);
+      }
       return res.json({ success: true });
     }
     case 'DELETE': {
       const { id } = req.body;
-      const orderId = typeof id === 'number' ? id.toFixed(1) : String(id);
-      await deleteOrder(orderId);
+      const sid = String(id).replace(/\.0$/, '');
+      const rows = await client.execute('SELECT id FROM orders');
+      const match = rows.rows.find(r => String(r.id).replace(/\.0$/, '') === sid);
+      if (match) {
+        await client.execute('DELETE FROM orders WHERE id = ?', [match.id]);
+      }
       return res.json({ success: true });
     }
     default:
