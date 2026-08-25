@@ -573,7 +573,7 @@ try{
 const r=await fetch(API+'/api/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
 const d=await r.json();
 if(d.token){_resetToken=d.token;showResetPassword()}
-else{document.getElementById('adminContent').innerHTML=\`<div style="text-align:center;padding:2rem"><p style="color:#888">\${d.message||'Email envoyé si le compte existe.'}</p><button onclick="showAdmin()" style="margin-top:1rem;padding:.5rem 1rem;background:#222;border:1px solid #333;color:#fff;border-radius:6px;cursor:pointer">Retour</button></div>\`}
+else{document.getElementById('adminContent').innerHTML=`<div style="text-align:center;padding:2rem"><p style="color:#888">${d.message||'Email envoyé si le compte existe.'}</p><button onclick="showAdmin()" style="margin-top:1rem;padding:.5rem 1rem;background:#222;border:1px solid #333;color:#fff;border-radius:6px;cursor:pointer">Retour</button></div>`}
 }catch(e){alert('Erreur de connexion')}
 }
 
