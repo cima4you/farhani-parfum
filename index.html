@@ -457,7 +457,7 @@ content.innerHTML=`<div style="display:flex;justify-content:space-between;align-
 <div class="info">📍 ${o.address}${o.notes?' | 📝 '+o.notes:''}</div>
 <div class="info"><span class="status ${o.status}">${o.status==='pending'?'En attente':'Confirmée'}</span> | Total: <strong style="color:#d4a853">${o.total.toLocaleString()} MAD</strong></div>
 <div class="items"><table><tr><th>Produit</th><th>Qté</th><th>Prix</th></tr>${o.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${(i.price*i.qty).toLocaleString()} MAD</td></tr>`).join('')}</table></div>
-<div style="margin-top:.8rem"><button onclick="toggleOrderStatus(${o.id})" style="background:#222;border:1px solid #333;color:#d4a853;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem">${o.status==='pending'?'✓ Confirmer':'↩ Remettre en attente'}</button>
+<div style="margin-top:.8rem"><button onclick="toggleOrderStatus(${o.id})" style="background:#222;border:1px solid #333;color:#d4a853;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem">${o.status==='pending'?'✓ Confirmer':'✕ Annuler'}</button>
 <button onclick="deleteOrder(${o.id})" style="background:#3a1111;border:1px solid #e74c3c44;color:#e74c3c;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem;margin-left:.5rem">🗑 Supprimer</button></div>
 </div>`).join('')}</div>`;
 container.appendChild(content);
