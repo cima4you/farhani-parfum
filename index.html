@@ -464,7 +464,7 @@ container.appendChild(content);
 }
 
 async function toggleOrderStatus(id){
-const o=orders.find(o=>String(o.id)===String(id));
+const o=orders.find(o=>Number(o.id)===Number(id));
 if(!o)return;
 const ns=o.status==='pending'?'confirmed':'pending';
 try{
@@ -476,7 +476,7 @@ o.status=ns;renderAdminPanel();
 async function deleteOrder(id){
 if(!confirm('Supprimer cette commande ?'))return;
 try{
-await fetch(API+'/api/orders',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:String(id)})});
+await fetch(API+'/api/orders',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:Number(id)})});
 renderAdminPanel();renderProducts();
 }catch(e){alert('Erreur')}
 }

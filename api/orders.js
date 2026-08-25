@@ -14,12 +14,14 @@ export default async function handler(req, res) {
     }
     case 'PATCH': {
       const { id, status } = req.body;
-      await updateOrderStatus(id, status);
+      const orderId = typeof id === 'number' ? id.toFixed(1) : String(id);
+      await updateOrderStatus(orderId, status);
       return res.json({ success: true });
     }
     case 'DELETE': {
       const { id } = req.body;
-      await deleteOrder(id);
+      const orderId = typeof id === 'number' ? id.toFixed(1) : String(id);
+      await deleteOrder(orderId);
       return res.json({ success: true });
     }
     default:
