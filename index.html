@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Farhani Parfum</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:system-ui,-apple-system,sans-serif;background:#0a0a0a;color:#e0e0e0;min-height:100vh}
@@ -522,7 +523,7 @@ function parseDate(str){const p=str.split(' ')[0].split('/');return new Date(p[2
 function getSalesTrend(days){
 const map={};
 for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.toLocaleDateString('fr-FR');map[k]={total:0,day:k.slice(0,5)}}
-orders.forEach(o=>{try{const k=parseDate(o.date).toLocaleDateString('fr-FR');if(map[k])map[k].total+=o.total}catch(e){}});
+orders.filter(o=>o.status==='confirmed').forEach(o=>{try{const k=parseDate(o.date).toLocaleDateString('fr-FR');if(map[k])map[k].total+=o.total}catch(e){}});
 const vals=Object.values(map);
 const max=Math.max(...vals.map(v=>v.total),1);
 return vals.map(v=>({...v,pct:Math.round(v.total/max*100)}));
@@ -644,13 +645,12 @@ else{alert('Erreur')}
 }
 async function exportOrders(){
 if(orders.length===0){alert('Aucune commande à exporter');return}
-let csv='ID,Date,Nom,Téléphone,Email,Adresse,Notes,Total,Statut,Produits\n';
-orders.forEach(o=>{
-const prods=o.items.map(i=>`${i.name} x${i.qty}`).join('; ');
-csv+=`${o.id},"${o.date}","${o.name}","${o.phone}","${o.email||''}","${o.address}","${o.notes||''}",${o.total},${o.status},"${prods}"\n`;
-});
-const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8'});
-const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='commandes_farhani.csv';a.click();
+const data=orders.map(o=>({'ID':o.id,'Date':o.date,'Nom':o.name,'Téléphone':o.phone,'Email':o.email||'','Adresse':o.address,'Code Postal':o.postal||'','Notes':o.notes||'','Total':o.total,'Statut':o.status==='confirmed'?'Confirmée':o.status==='cancelled'?'Annulée':'En attente','Produits':o.items.map(i=>`${i.name} x${i.qty}`).join('; ')}));
+const ws=XLSX.utils.json_to_sheet(data);
+const wb=XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb,ws,'Commandes');
+ws['!cols']=[{wch:18},{wch:20},{wch:22},{wch:15},{wch:28},{wch:30},{wch:10},{wch:20},{wch:12},{wch:12},{wch:40}];
+XLSX.writeFile(wb,'commandes_farhani.xlsx');
 }
 
 function renderProductsAdmin(container){
