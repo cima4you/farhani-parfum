@@ -81,6 +81,7 @@ nav a:hover{color:#d4a853}
 .status{display:inline-block;padding:.2rem .6rem;border-radius:4px;font-size:.8rem;font-weight:600}
 .status.pending{background:#5a3e00;color:#d4a853}
 .status.confirmed{background:#003d1a;color:#4caf50}
+.status.cancelled{background:#3d0000;color:#e74c3c}
 .empty-state{text-align:center;padding:3rem;color:#555}
 .empty-state .icon{font-size:4rem;margin-bottom:1rem}
 .admin-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid #222;padding-bottom:.75rem}
@@ -413,6 +414,7 @@ renderAdminLayout(document.getElementById('adminContent'));
 function renderDashboard(container){
 const confirmed=orders.filter(o=>o.status==='confirmed');
 const pending=orders.filter(o=>o.status==='pending');
+const cancelled=orders.filter(o=>o.status==='cancelled');
 const totalRev=orders.reduce((s,o)=>s+o.total,0);
 const confirmedRev=confirmed.reduce((s,o)=>s+o.total,0);
 
@@ -421,6 +423,7 @@ container.innerHTML+=`<div class="dash-grid">
 <div class="dash-card orders"><div class="icon">📦</div><div class="value">${orders.length}</div><div class="label">Total commandes</div></div>
 <div class="dash-card pending"><div class="icon">⏳</div><div class="value">${pending.length}</div><div class="label">En attente</div></div>
 <div class="dash-card confirmed"><div class="icon">✅</div><div class="value">${confirmed.length}</div><div class="label">Confirmées</div></div>
+<div class="dash-card" style="background:#1a1a1a;border:1px solid #222;border-radius:12px;padding:1.2rem;text-align:center"><div class="icon">❌</div><div class="value" style="font-size:1.6rem;font-weight:700;color:#e74c3c">${cancelled.length}</div><div class="label">Annulées</div></div>
 </div>`;
 
 if(orders.length===0){
@@ -440,7 +443,7 @@ const trend=getSalesTrend(7);
 container.innerHTML+=`<div class="chart-box"><h3>📈 Évolution des ventes (7 jours)</h3><div style="display:flex;flex-direction:row;align-items:flex-end;justify-content:space-between;height:130px;gap:.3rem;padding:.5rem 0">${trend.map(d=>`<div class="bar-col"><div class="bar-h gold" style="height:${d.pct}%"></div><div class="val-label">${d.total.toLocaleString()}</div><div class="day-label">${d.day}</div></div>`).join('')}</div></div>`;
 
 const recent=[...orders].sort((a,b)=>b.id-a.id).slice(0,5);
-container.innerHTML+=`<div class="chart-box" style="margin-top:0"><h3>🕐 Dernières commandes</h3>${recent.map(o=>`<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid #222;font-size:.85rem"><span style="color:#bbb">#${o.id} — ${o.name}</span><span style="color:#d4a853">${o.total.toLocaleString()} MAD</span><span class="status ${o.status}">${o.status==='pending'?'En attente':'Confirmée'}</span></div>`).join('')}</div>`;
+container.innerHTML+=`<div class="chart-box" style="margin-top:0"><h3>🕐 Dernières commandes</h3>${recent.map(o=>`<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid #222;font-size:.85rem"><span style="color:#bbb">#${o.id} — ${o.name}</span><span style="color:#d4a853">${o.total.toLocaleString()} MAD</span><span class="status ${o.status}">${o.status==='pending'?'En attente':o.status==='cancelled'?'Annulée':'Confirmée'}</span></div>`).join('')}</div>`;
 }
 
 function renderOrdersList(container){
@@ -455,9 +458,9 @@ content.innerHTML=`<div style="display:flex;justify-content:space-between;align-
 <h3>#${o.id} — ${o.name}</h3>
 <div class="info">📅 ${o.date} | 📞 ${o.phone}${o.email?' | ✉️ '+o.email:''}</div>
 <div class="info">📍 ${o.address}${o.notes?' | 📝 '+o.notes:''}</div>
-<div class="info"><span class="status ${o.status}">${o.status==='pending'?'En attente':'Confirmée'}</span> | Total: <strong style="color:#d4a853">${o.total.toLocaleString()} MAD</strong></div>
+<div class="info"><span class="status ${o.status}">${o.status==='pending'?'En attente':o.status==='cancelled'?'Annulée':'Confirmée'}</span> | Total: <strong style="color:#d4a853">${o.total.toLocaleString()} MAD</strong></div>
 <div class="items"><table><tr><th>Produit</th><th>Qté</th><th>Prix</th></tr>${o.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${(i.price*i.qty).toLocaleString()} MAD</td></tr>`).join('')}</table></div>
-<div style="margin-top:.8rem"><button onclick="toggleOrderStatus(${o.id})" style="background:#222;border:1px solid #333;color:#d4a853;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem">${o.status==='pending'?'✓ Confirmer':'✕ Annuler'}</button>
+<div style="margin-top:.8rem">${o.status!=='cancelled'?`<button onclick="toggleOrderStatus(${o.id})" style="background:#222;border:1px solid #333;color:#d4a853;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem">${o.status==='pending'?'✓ Confirmer':'✕ Annuler'}</button>`:''}
 <button onclick="deleteOrder(${o.id})" style="background:#3a1111;border:1px solid #e74c3c44;color:#e74c3c;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem;margin-left:.5rem">🗑 Supprimer</button></div>
 </div>`).join('')}</div>`;
 container.appendChild(content);
@@ -466,7 +469,7 @@ container.appendChild(content);
 async function toggleOrderStatus(id){
 const o=orders.find(o=>Number(o.id)===Number(id));
 if(!o)return;
-const ns=o.status==='pending'?'confirmed':'pending';
+const ns=o.status==='pending'?'confirmed':'cancelled';
 try{
 await fetch(API+'/api/orders',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:String(id),status:ns})});
 o.status=ns;renderAdminPanel();
