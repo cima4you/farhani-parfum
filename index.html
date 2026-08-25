@@ -307,11 +307,14 @@ const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
 container.innerHTML+=`<div class="cart-total">Total : <span>${total.toLocaleString()} MAD</span></div>`;
 container.innerHTML+=`<div class="checkout-form">
 <div class="row">
-<input id="checkName" placeholder="Nom complet" required>
-<input id="checkPhone" placeholder="Téléphone" required>
+<input id="checkName" placeholder="Nom complet *" required>
+<input id="checkPhone" placeholder="Téléphone *" required>
 </div>
+<div class="row">
 <input id="checkEmail" placeholder="Email">
-<input id="checkAddress" placeholder="Adresse de livraison" required>
+<input id="checkPostal" placeholder="Code Postal *" required>
+</div>
+<input id="checkAddress" placeholder="Adresse de livraison *" required>
 <textarea id="checkNotes" placeholder="Notes (optionnel)"></textarea>
 <button class="submit-btn" onclick="submitOrder()">Confirmer la commande</button>
 </div>`;
@@ -335,9 +338,10 @@ const name=document.getElementById('checkName').value.trim();
 const phone=document.getElementById('checkPhone').value.trim();
 const email=document.getElementById('checkEmail').value.trim();
 const address=document.getElementById('checkAddress').value.trim();
-if(!name||!phone||!address){alert('Veuillez remplir les champs obligatoires');return;}
+const postal=document.getElementById('checkPostal').value.trim();
+if(!name||!phone||!address||!postal){alert('Veuillez remplir les champs obligatoires (*)');return;}
 if(cart.length===0){alert('Votre panier est vide');return;}
-const order={id:Date.now(),date:new Date().toLocaleString('fr-FR'),name,phone,email,address,notes:document.getElementById('checkNotes').value.trim(),items:[...cart],total:cart.reduce((s,i)=>s+i.price*i.qty,0),status:'pending'};
+const order={id:Date.now(),date:new Date().toLocaleString('fr-FR'),name,phone,email,address:address+' — CP: '+postal,notes:document.getElementById('checkNotes').value.trim(),items:[...cart],total:cart.reduce((s,i)=>s+i.price*i.qty,0),status:'pending'};
 try{
 await fetch(API+'/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(order)});
 }catch(e){alert('Erreur d\'envoi de la commande');return}
