@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farhani Parfum</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0a0a0a;color:#e0e0e0;min-height:100vh}
+header{background:#111;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;position:sticky;top:0;z-index:100}
+.logo{font-size:1.5rem;font-weight:700;color:#d4a853;letter-spacing:2px;text-transform:uppercase}
+.logo span{color:#fff;font-weight:300}
+nav{display:flex;gap:1.5rem;align-items:center}
+nav a{color:#bbb;text-decoration:none;font-size:.9rem;transition:color .2s;cursor:pointer}
+nav a:hover{color:#d4a853}
+.cart-btn{background:#d4a853;color:#111;border:none;padding:.5rem 1rem;border-radius:6px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:background .2s}
+.cart-btn:hover{background:#c49a3f}
+.cart-count{background:#111;color:#d4a853;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700}
+.hero{text-align:center;padding:3rem 1rem;background:linear-gradient(135deg,#0d0d0d,#1a1a1a);border-bottom:1px solid #222}
+.hero h1{font-size:2.5rem;color:#d4a853;margin-bottom:.5rem}
+.hero p{color:#888;font-size:1.1rem}
+.search-bar{max-width:500px;margin:1.5rem auto 0;display:flex;gap:.5rem}
+.search-bar input{flex:1;padding:.75rem 1rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem}
+.search-bar input::placeholder{color:#666}
+.search-bar select{padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:.9rem}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.5rem;padding:2rem;max-width:1400px;margin:0 auto}
+.product-card{background:#141414;border:1px solid #222;border-radius:12px;overflow:hidden;transition:transform .2s,border-color .2s}
+.product-card:hover{transform:translateY(-4px);border-color:#d4a85344}
+.product-img{width:100%;height:220px;object-fit:cover;background:#1e1e1e;display:flex;align-items:center;justify-content:center;font-size:3rem}
+.product-info{padding:1rem}
+.product-brand{color:#d4a853;font-size:.8rem;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.product-name{font-size:1rem;font-weight:600;margin:.3rem 0;color:#fff}
+.product-desc{color:#777;font-size:.85rem;margin-bottom:.5rem;line-height:1.3}
+.product-price{color:#d4a853;font-size:1.3rem;font-weight:700}
+.product-price span{font-size:.85rem;color:#888;font-weight:400}
+.add-btn{width:100%;margin-top:.8rem;padding:.6rem;background:#d4a853;color:#111;border:none;border-radius:6px;font-weight:600;cursor:pointer;transition:background .2s;font-size:.9rem}
+.add-btn:hover{background:#c49a3f}
+.add-btn:disabled{background:#333;color:#666;cursor:not-allowed}
+.section-title{max-width:1400px;margin:2rem auto 0;padding:0 2rem;font-size:1.5rem;color:#fff}
+.section-title span{color:#d4a853}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:200;justify-content:center;align-items:center}
+.modal.active{display:flex}
+.modal-content{background:#141414;border:1px solid #333;border-radius:16px;padding:2rem;width:90%;max-width:800px;max-height:90vh;overflow-y:auto}
+.modal.admin-wide .modal-content{max-width:1000px}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+.modal-header h2{color:#d4a853}
+.close-btn{background:none;border:none;color:#888;font-size:1.5rem;cursor:pointer}
+.close-btn:hover{color:#fff}
+.cart-items{display:flex;flex-direction:column;gap:1rem}
+.cart-item{display:flex;align-items:center;gap:1rem;padding:1rem;background:#1a1a1a;border-radius:8px}
+.cart-item-img{width:60px;height:60px;border-radius:8px;background:#222;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.cart-item-info{flex:1}
+.cart-item-name{font-weight:600;color:#fff}
+.cart-item-price{color:#d4a853}
+.cart-item-qty{display:flex;align-items:center;gap:.5rem}
+.cart-item-qty button{background:#222;border:1px solid #333;color:#fff;width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:1rem}
+.cart-item-qty button:hover{background:#333}
+.cart-item-qty span{width:24px;text-align:center}
+.cart-item-remove{background:none;border:none;color:#e74c3c;cursor:pointer;font-size:1.2rem}
+.cart-total{padding:1rem 0;text-align:right;font-size:1.2rem;border-top:1px solid #222;margin-top:1rem}
+.cart-total span{color:#d4a853;font-weight:700}
+.checkout-form{display:grid;gap:1rem;margin-top:1rem}
+.checkout-form input,.checkout-form textarea{width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem}
+.checkout-form textarea{resize:vertical;min-height:80px}
+.checkout-form input::placeholder,.checkout-form textarea::placeholder{color:#666}
+.checkout-form .row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.submit-btn{background:#d4a853;color:#111;border:none;padding:1rem;border-radius:8px;font-weight:700;font-size:1.1rem;cursor:pointer;transition:background .2s}
+.submit-btn:hover{background:#c49a3f}
+.admin-section{max-width:1400px;margin:2rem auto;padding:0 2rem}
+.admin-login{display:flex;gap:.5rem;justify-content:center;margin:2rem 0}
+.admin-login input{padding:.5rem;border:1px solid #333;border-radius:4px;background:#1a1a1a;color:#fff}
+.admin-login button{padding:.5rem 1rem;background:#d4a853;border:none;border-radius:4px;color:#111;font-weight:600;cursor:pointer}
+.order-list{display:flex;flex-direction:column;gap:1rem}
+.order-card{background:#141414;border:1px solid #222;border-radius:12px;padding:1.5rem}
+.order-card h3{color:#d4a853;margin-bottom:.5rem}
+.order-card .info{color:#888;font-size:.9rem;margin-bottom:.5rem}
+.order-card .items{margin-top:1rem}
+.order-card .items table{width:100%;border-collapse:collapse}
+.order-card .items th,.order-card .items td{text-align:left;padding:.5rem;border-bottom:1px solid #222;font-size:.9rem}
+.order-card .items th{color:#d4a853}
+.status{display:inline-block;padding:.2rem .6rem;border-radius:4px;font-size:.8rem;font-weight:600}
+.status.pending{background:#5a3e00;color:#d4a853}
+.status.confirmed{background:#003d1a;color:#4caf50}
+.empty-state{text-align:center;padding:3rem;color:#555}
+.empty-state .icon{font-size:4rem;margin-bottom:1rem}
+.admin-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;border-bottom:1px solid #222;padding-bottom:.75rem}
+.admin-tab{padding:.5rem 1.2rem;border-radius:6px;border:1px solid #333;background:transparent;color:#888;cursor:pointer;font-size:.9rem;transition:all .2s}
+.admin-tab:hover{border-color:#d4a85344;color:#fff}
+.admin-tab.active{background:#d4a853;color:#111;border-color:#d4a853;font-weight:600}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
+.dash-card{background:#1a1a1a;border:1px solid #222;border-radius:12px;padding:1.2rem;text-align:center}
+.dash-card .icon{font-size:1.8rem;margin-bottom:.3rem}
+.dash-card .value{font-size:1.6rem;font-weight:700;color:#fff}
+.dash-card .label{color:#888;font-size:.8rem;margin-top:.2rem}
+.dash-card.revenue .value{color:#d4a853}
+.dash-card.orders .value{color:#4fc3f7}
+.dash-card.pending .value{color:#ffa726}
+.dash-card.confirmed .value{color:#66bb6a}
+.dash-charts{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+@media(max-width:768px){.dash-charts{grid-template-columns:1fr}}
+.chart-box{background:#1a1a1a;border:1px solid #222;border-radius:12px;padding:1.2rem}
+.chart-box h3{color:#d4a853;font-size:.95rem;margin-bottom:1rem;text-align:center}
+.chart-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;font-size:.8rem}
+.chart-row .bar-wrap{flex:1;background:#222;border-radius:4px;height:20px;overflow:hidden}
+.chart-row .bar{height:100%;border-radius:4px;transition:width .6s ease}
+.chart-row .bar.gold{background:linear-gradient(90deg,#d4a853,#c49a3f)}
+.chart-row .bar.blue{background:linear-gradient(90deg,#4fc3f7,#0288d1)}
+.chart-row .bar.green{background:linear-gradient(90deg,#66bb6a,#388e3c)}
+.chart-row .bar.purple{background:linear-gradient(90deg,#ab47bc,#7b1fa2)}
+.chart-row .bar.teal{background:linear-gradient(90deg,#26a69a,#00695c)}
+.chart-row .name{color:#bbb;min-width:80px;text-align:right}
+.chart-row .pct{color:#888;min-width:36px;text-align:right}
+.chart-col{display:flex;flex-direction:column;gap:.4rem}
+.bar-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:.3rem}
+.bar-col .bar-h{width:100%;border-radius:4px;min-height:4px;transition:height .6s ease}
+.bar-col .bar-h.gold{background:linear-gradient(180deg,#d4a853,#c49a3f)}
+.bar-col .bar-h.blue{background:linear-gradient(180deg,#4fc3f7,#0288d1)}
+.bar-col .bar-h.green{background:linear-gradient(180deg,#66bb6a,#388e3c)}
+.bar-col .bar-h.purple{background:linear-gradient(180deg,#ab47bc,#7b1fa2)}
+.bar-col .bar-h.teal{background:linear-gradient(180deg,#26a69a,#00695c)}
+.bar-col .bar-h.orange{background:linear-gradient(180deg,#ffa726,#e65100)}
+.bar-col .day-label{color:#888;font-size:.65rem;white-space:nowrap}
+.bar-col .val-label{color:#fff;font-size:.7rem;font-weight:600}
+.dash-trend{display:flex;flex-direction:row;align-items:flex-end;justify-content:space-between;height:140px;gap:.3rem;padding:0 .2rem}
+.admin-top-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+footer{text-align:center;padding:2rem;color:#444;border-top:1px solid #222;margin-top:3rem}
+@media(max-width:768px){
+.products{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));padding:1rem;gap:1rem}
+header{padding:.75rem 1rem;flex-wrap:wrap;gap:.5rem}
+.logo{font-size:1.2rem}
+.hero h1{font-size:1.5rem}
+.search-bar{flex-direction:column}
+.checkout-form .row{grid-template-columns:1fr}
+.cart-item{flex-wrap:wrap}
+.modal.admin-wide .modal-content{max-width:95%;padding:1rem}
+.dash-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">Farhani <span>Parfum</span></div>
+<nav>
+<a onclick="showAdmin()">Admin</a>
+<button class="cart-btn" onclick="toggleCart()">Panier <span class="cart-count" id="cartCount">0</span></button>
+</nav>
+</header>
+
+<section class="hero">
+<h1>Farhani Parfum</h1>
+<p>Parfumerie de luxe — Authenticité & Élégance</p>
+<div class="search-bar">
+<input type="text" id="searchInput" placeholder="Rechercher un parfum..." oninput="renderProducts()">
+<select id="brandFilter" onchange="renderProducts()">
+<option value="">Toutes les marques</option>
+</select>
+</div>
+</section>
+
+<div class="section-title">Nos <span>Parfums</span></div>
+<div class="products" id="productsGrid"></div>
+
+<div class="modal" id="cartModal">
+<div class="modal-content">
+<div class="modal-header">
+<h2>Votre Panier</h2>
+<button class="close-btn" onclick="toggleCart()">&times;</button>
+</div>
+<div id="cartContent"></div>
+</div>
+</div>
+
+<div class="modal admin-wide" id="adminModal">
+<div class="modal-content">
+<div class="modal-header">
+<h2>Administration</h2>
+<button class="close-btn" onclick="closeAdmin()">&times;</button>
+</div>
+<div id="adminContent"></div>
+</div>
+</div>
+
+<div class="modal" id="confirmModal">
+<div class="modal-content" style="max-width:500px;text-align:center">
+<div class="modal-header">
+<h2>Commande Confirmée</h2>
+<button class="close-btn" onclick="closeConfirm()">&times;</button>
+</div>
+<div id="confirmContent">
+<div style="font-size:4rem;margin:1rem 0">&#10003;</div>
+<p style="color:#888;margin-bottom:1rem">Merci pour votre commande ! Vous recevrez un email de confirmation.</p>
+<button class="submit-btn" onclick="closeConfirm()" style="width:auto;padding:.75rem 2rem">Fermer</button>
+</div>
+</div>
+</div>
+
+<footer>
+&copy; 2026 Farhani Parfum — Tous droits réservés
+</footer>
+
+<script>
+const PERFUMES = [
+{id:1,name:"Libre Le Parfum",brand:"Yves Saint Laurent",price:1692,desc:"Parfum floral ambré, intense et sophistiqué",cat:"Femme",img:"🌹"},
+{id:2,name:"Libre EDP Intense 50ml",brand:"Yves Saint Laurent",price:1207,desc:"Intensité florale avec lavande et vanille",cat:"Femme",img:"🌺"},
+{id:3,name:"Paradoxe Radical Essence 50ml",brand:"Prada",price:1250,desc:"Un paradoxe floral audacieux et captivant",cat:"Femme",img:"🌸"},
+{id:4,name:"Bad Boy Cobalt Elixir 50ml",brand:"Carolina Herrera",price:888,desc:"Elixir boisé épicé pour homme moderne",cat:"Homme",img:"🪵"},
+{id:5,name:"Si Passione 50ml",brand:"Giorgio Armani",price:1071,desc:"Rose et poire, une passion intense",cat:"Femme",img:"🌹"},
+{id:6,name:"La Petite Robe Noire 30ml",brand:"Guerlain",price:972,desc:"Le charme noir revisité, gourmand et floral",cat:"Femme",img:"🖤"},
+{id:7,name:"This Is Really Her 100ml",brand:"Zadig & Voltaire",price:1367,desc:"Vanille boisée, féminine et moderne",cat:"Femme",img:"✨"},
+{id:8,name:"Bright Crystal 90ml",brand:"Versace",price:1153,desc:"Frais et floral, un éclat de cristal",cat:"Femme",img:"💎"},
+{id:9,name:"Her Parfum 100ml",brand:"Burberry",price:1475,desc:"Un parfum moderne, féminin et audacieux",cat:"Femme",img:"🍓"},
+{id:10,name:"Hypnotic Poison 50ml",brand:"Dior",price:1392,desc:"Le poison envoûtant à l'amande et à la vanille",cat:"Femme",img:"💫"},
+{id:11,name:"Sauvage EDP 60ml",brand:"Dior",price:1250,desc:"Fraîcheur radicale, ambre boisé puissant",cat:"Homme",img:"🌵"},
+{id:12,name:"Bleu de Chanel EDP 50ml",brand:"Chanel",price:1180,desc:"Parfum boisé aromatique intemporel",cat:"Homme",img:"💙"},
+{id:13,name:"Acqua di Gio Profondo 75ml",brand:"Giorgio Armani",price:1090,desc:"Fraîcheur marine profonde et minérale",cat:"Homme",img:"🌊"},
+{id:14,name:"1 Million 100ml",brand:"Paco Rabanne",price:950,desc:"Cuir épicé, audacieux et irrésistible",cat:"Homme",img:"🥇"},
+{id:15,name:"Invictus 100ml",brand:"Paco Rabanne",price:920,desc:"Fraîcheur marine et ambre gris victorieux",cat:"Homme",img:"🏆"},
+{id:16,name:"Good Girl 50ml",brand:"Carolina Herrera",price:1100,desc:"Parfum floral ambré en talon aiguille",cat:"Femme",img:"👠"},
+{id:17,name:"La Nuit Trésor 50ml",brand:"Lancôme",price:1050,desc:"Rose et vanille, un trésor de volupté",cat:"Femme",img:"🌙"},
+{id:18,name:"Black Opium 50ml",brand:"Yves Saint Laurent",price:1150,desc:"Café et vanille, addiction florale",cat:"Femme",img:"☕"},
+{id:19,name:"L'Homme Ideal 100ml",brand:"Guerlain",price:890,desc:"Amande et cuir, l'homme idéal revisité",cat:"Homme",img:"👔"},
+{id:20,name:"Stronger With You 100ml",brand:"Emporio Armani",price:960,desc:"Châtaigne et vanille, parfum de couple",cat:"Homme",img:"❤️"},
+{id:21,name:"J'adore 50ml",brand:"Dior",price:1280,desc:"Bouquet floral emblématique de féminité",cat:"Femme",img:"🌼"},
+{id:22,name:"Angel 50ml",brand:"Mugler",price:1050,desc:"Patchouli et praline, légendaire et gourmand",cat:"Femme",img:"👼"},
+{id:23,name:"Aventus 100ml",brand:"Creed",price:2800,desc:"Ananas et bouleau, mythe masculin",cat:"Homme",img:"🍍"},
+{id:24,name:"Terre d'Hermès 50ml",brand:"Hermès",price:980,desc:"Minéral et boisé, la terre en parfum",cat:"Homme",img:"🌍"},
+{id:25,name:"Flower by Kenzo 50ml",brand:"Kenzo",price:820,desc:"Coquelicot et poudre, féminin poétique",cat:"Femme",img:"🌷"},
+{id:26,name:"Light Blue 50ml",brand:"Dolce & Gabbana",price:890,desc:"Sicile ensoleillée, citron et pomme",cat:"Femme",img:"🍋"},
+{id:27,name:"Le Male Le Parfum 75ml",brand:"Jean Paul Gaultier",price:1050,desc:"Vanille et cardamome, masculin intense",cat:"Homme",img:"💪"},
+{id:28,name:"L'Interdit 50ml",brand:"Givenchy",price:1120,desc:"Tubéreuse et vanille, l'interdit sensuel",cat:"Femme",img:"🚫"},
+{id:29,name:"Pasha Parfum 100ml",brand:"Cartier",price:1600,desc:"Bois précieux, élégance suprême",cat:"Homme",img:"👑"},
+{id:30,name:"Alien 60ml",brand:"Mugler",price:1150,desc:"Ambrette et bois, féminin mystérieux",cat:"Femme",img:"👽"},
+];
+
+const API = '';
+let cart = JSON.parse(localStorage.getItem('farhaniCart')||'[]');
+let orders = [];
+let adminUnlocked = false;
+
+function saveCart(){localStorage.setItem('farhaniCart',JSON.stringify(cart));updateCartCount()}
+
+function updateCartCount(){
+const count=cart.reduce((s,i)=>s+i.qty,0);
+document.getElementById('cartCount').textContent=count;
+}
+
+function renderProducts(){
+const search=document.getElementById('searchInput').value.toLowerCase();
+const brand=document.getElementById('brandFilter').value;
+const grid=document.getElementById('productsGrid');
+let filtered=PERFUMES.filter(p=>(!search||p.name.toLowerCase().includes(search)||p.brand.toLowerCase().includes(search))&&(!brand||p.brand===brand));
+if(filtered.length===0){
+grid.innerHTML='<div class="empty-state"><div class="icon">🔍</div><p>Aucun parfum trouvé</p></div>';
+return;
+}
+grid.innerHTML=filtered.map(p=>{
+const inCart=cart.find(c=>c.id===p.id);
+return `<div class="product-card">
+<div class="product-img">${p.img}</div>
+<div class="product-info">
+<div class="product-brand">${p.brand}</div>
+<div class="product-name">${p.name}</div>
+<div class="product-desc">${p.desc} — ${p.cat}</div>
+<div class="product-price">${p.price.toLocaleString()} MAD <span>/ ${p.price/2} pts</span></div>
+<button class="add-btn" onclick="addToCart(${p.id})" ${inCart?'disabled':''}>${inCart?'Dans le panier':'Ajouter au panier'}</button>
+</div>
+</div>`;
+}).join('');
+}
+
+function addToCart(id){
+const existing=cart.find(c=>c.id===id);
+if(existing)return;
+const p=PERFUMES.find(p=>p.id===id);
+cart.push({...p,qty:1});
+saveCart();renderProducts();
+}
+
+function toggleCart(){
+const modal=document.getElementById('cartModal');
+modal.classList.toggle('active');
+if(modal.classList.contains('active'))renderCart();
+}
+
+function renderCart(){
+const container=document.getElementById('cartContent');
+if(cart.length===0){
+container.innerHTML='<div class="empty-state"><div class="icon">🛒</div><p>Votre panier est vide</p></div>';
+return;
+}
+container.innerHTML=cart.map(i=>`<div class="cart-item">
+<div class="cart-item-img">${i.img}</div>
+<div class="cart-item-info">
+<div class="cart-item-name">${i.name}</div>
+<div class="cart-item-price">${i.price.toLocaleString()} MAD</div>
+</div>
+<div class="cart-item-qty">
+<button onclick="changeQty(${i.id},-1)">−</button>
+<span>${i.qty}</span>
+<button onclick="changeQty(${i.id},1)">+</button>
+</div>
+<button class="cart-item-remove" onclick="removeFromCart(${i.id})">&times;</button>
+</div>`).join('');
+const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+container.innerHTML+=`<div class="cart-total">Total : <span>${total.toLocaleString()} MAD</span></div>`;
+container.innerHTML+=`<div class="checkout-form">
+<div class="row">
+<input id="checkName" placeholder="Nom complet" required>
+<input id="checkPhone" placeholder="Téléphone" required>
+</div>
+<input id="checkEmail" placeholder="Email">
+<input id="checkAddress" placeholder="Adresse de livraison" required>
+<textarea id="checkNotes" placeholder="Notes (optionnel)"></textarea>
+<button class="submit-btn" onclick="submitOrder()">Confirmer la commande</button>
+</div>`;
+}
+
+function changeQty(id,delta){
+const item=cart.find(i=>i.id===id);
+if(!item)return;
+item.qty+=delta;
+if(item.qty<=0)cart=cart.filter(i=>i.id!==id);
+saveCart();renderCart();
+}
+
+function removeFromCart(id){
+cart=cart.filter(i=>i.id!==id);
+saveCart();renderCart();renderProducts();
+}
+
+async function submitOrder(){
+const name=document.getElementById('checkName').value.trim();
+const phone=document.getElementById('checkPhone').value.trim();
+const email=document.getElementById('checkEmail').value.trim();
+const address=document.getElementById('checkAddress').value.trim();
+if(!name||!phone||!address){alert('Veuillez remplir les champs obligatoires');return;}
+if(cart.length===0){alert('Votre panier est vide');return;}
+const order={id:Date.now(),date:new Date().toLocaleString('fr-FR'),name,phone,email,address,notes:document.getElementById('checkNotes').value.trim(),items:[...cart],total:cart.reduce((s,i)=>s+i.price*i.qty,0),status:'pending'};
+try{
+await fetch(API+'/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(order)});
+}catch(e){alert('Erreur d\'envoi de la commande');return}
+localStorage.removeItem('farhaniCart');cart=[];
+saveCart();renderProducts();
+document.getElementById('cartModal').classList.remove('active');
+document.getElementById('confirmModal').classList.add('active');
+}
+
+function closeConfirm(){
+document.getElementById('confirmModal').classList.remove('active');
+}
+
+function showAdmin(){
+document.getElementById('adminModal').classList.add('active');
+if(!adminUnlocked){
+document.getElementById('adminContent').innerHTML=`
+<div class="admin-login" style="flex-direction:column;align-items:stretch;max-width:360px;margin:0 auto">
+<input type="text" id="adminUser" placeholder="Nom d'utilisateur" style="padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem">
+<input type="password" id="adminPass" placeholder="Mot de passe" style="padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin-top:.5rem">
+<button onclick="unlockAdmin()" style="margin-top:.5rem;padding:.75rem;background:#d4a853;color:#111;border:none;border-radius:6px;font-weight:700;font-size:1rem;cursor:pointer">Connexion</button>
+</div>
+<div style="text-align:center;margin-top:1rem">
+<button onclick="showForgotPassword()" style="background:none;border:none;color:#888;font-size:.8rem;cursor:pointer;text-decoration:underline">Mot de passe oublié ?</button>
+</div>`;
+}else{renderAdminPanel()}
+}
+
+function closeAdmin(){
+document.getElementById('adminModal').classList.remove('active');
+}
+
+async function unlockAdmin(){
+const user=document.getElementById('adminUser').value.trim();
+const pwd=document.getElementById('adminPass').value;
+if(!user||!pwd){alert('Veuillez entrer vos identifiants');return}
+try{
+const r=await fetch(API+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:user,password:pwd})});
+if(r.ok){adminUnlocked=true;renderAdminPanel()}
+else{const d=await r.json();alert(d.error||'Identifiants incorrects')}
+}catch(e){alert('Erreur de connexion au serveur')}
+}
+
+let _adminTab = 'dashboard';
+
+async function renderAdminPanel(){
+const container=document.getElementById('adminContent');
+try{
+const r=await fetch(API+'/api/orders');orders=await r.json()
+}catch(e){orders=[]}
+renderAdminLayout(container);
+}
+
+function renderAdminLayout(container){
+const tabs=`<div class="admin-tabs">
+<button class="admin-tab${_adminTab==='dashboard'?' active':''}" onclick="switchAdminTab('dashboard')">📊 Tableau de bord</button>
+<button class="admin-tab${_adminTab==='orders'?' active':''}" onclick="switchAdminTab('orders')">📦 Commandes (${orders.length})</button>
+</div>`;
+const topBtns=`<div style="display:flex;gap:.5rem;flex-wrap:wrap">
+<button onclick="showChangePwd()" style="background:#222;border:1px solid #333;color:#fff;padding:.4rem .8rem;border-radius:6px;cursor:pointer;font-size:.85rem">🔑 Mdp</button>
+<button onclick="showAdminEmail()" style="background:#222;border:1px solid #333;color:#fff;padding:.4rem .8rem;border-radius:6px;cursor:pointer;font-size:.85rem">📧 Email</button>
+<button onclick="logoutAdmin()" style="background:#3a1111;border:1px solid #e74c3c44;color:#e74c3c;padding:.4rem .8rem;border-radius:6px;cursor:pointer;font-size:.85rem">🚪 Quitter</button>
+</div>`;
+container.innerHTML=tabs+topBtns;
+if(_adminTab==='dashboard')renderDashboard(container);
+else renderOrdersList(container);
+}
+
+function switchAdminTab(tab){
+_adminTab=tab;
+renderAdminLayout(document.getElementById('adminContent'));
+}
+
+function renderDashboard(container){
+const confirmed=orders.filter(o=>o.status==='confirmed');
+const pending=orders.filter(o=>o.status==='pending');
+const totalRev=orders.reduce((s,o)=>s+o.total,0);
+const confirmedRev=confirmed.reduce((s,o)=>s+o.total,0);
+
+container.innerHTML+=`<div class="dash-grid">
+<div class="dash-card revenue"><div class="icon">💰</div><div class="value">${totalRev.toLocaleString()} <span style="font-size:.8rem;color:#888">MAD</span></div><div class="label">Chiffre d'affaires total</div></div>
+<div class="dash-card orders"><div class="icon">📦</div><div class="value">${orders.length}</div><div class="label">Total commandes</div></div>
+<div class="dash-card pending"><div class="icon">⏳</div><div class="value">${pending.length}</div><div class="label">En attente</div></div>
+<div class="dash-card confirmed"><div class="icon">✅</div><div class="value">${confirmed.length}</div><div class="label">Confirmées</div></div>
+</div>`;
+
+if(orders.length===0){
+container.innerHTML+=`<div class="empty-state"><div class="icon">📊</div><p>Aucune donnée de vente pour le moment</p></div>`;
+return;
+}
+
+const topProducts=getTopProducts(5);
+const brandSales=getBrandSales();
+
+container.innerHTML+=`<div class="dash-charts">
+<div class="chart-box"><h3>🏆 Top 5 produits</h3>${topProducts.map((p,i)=>`<div class="chart-row"><span class="name" style="min-width:20px;color:#d4a853">#${i+1}</span><span class="name" style="flex:1;text-align:left">${p.name}</span><div class="bar-wrap"><div class="bar gold" style="width:${p.pct}%"></div></div><span class="pct">${p.qty}</span></div>`).join('')}</div>
+<div class="chart-box"><h3>🏷️ Ventes par marque</h3>${brandSales.map(b=>`<div class="chart-row"><span class="name" style="text-align:left;flex:1">${b.brand}</span><div class="bar-wrap"><div class="bar blue" style="width:${b.pct}%"></div></div><span class="pct">${b.qty}</span></div>`).join('')}</div>
+</div>`;
+
+const trend=getSalesTrend(7);
+container.innerHTML+=`<div class="chart-box"><h3>📈 Évolution des ventes (7 jours)</h3><div style="display:flex;flex-direction:row;align-items:flex-end;justify-content:space-between;height:130px;gap:.3rem;padding:.5rem 0">${trend.map(d=>`<div class="bar-col"><div class="bar-h gold" style="height:${d.pct}%"></div><div class="val-label">${d.total.toLocaleString()}</div><div class="day-label">${d.day}</div></div>`).join('')}</div></div>`;
+
+const recent=[...orders].sort((a,b)=>b.id-a.id).slice(0,5);
+container.innerHTML+=`<div class="chart-box" style="margin-top:0"><h3>🕐 Dernières commandes</h3>${recent.map(o=>`<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid #222;font-size:.85rem"><span style="color:#bbb">#${o.id} — ${o.name}</span><span style="color:#d4a853">${o.total.toLocaleString()} MAD</span><span class="status ${o.status}">${o.status==='pending'?'En attente':'Confirmée'}</span></div>`).join('')}</div>`;
+}
+
+function renderOrdersList(container){
+const content=document.createElement('div');
+if(orders.length===0){
+content.innerHTML=`<div class="empty-state" style="margin-top:1rem"><div class="icon">📦</div><p>Aucune commande pour le moment</p></div>`;
+container.appendChild(content);
+return;
+}
+content.style.marginTop='1rem';
+content.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><span style="color:#888">${orders.length} commande(s)</span>${orders.length>0?'<button onclick="exportOrders()" style="background:#222;border:1px solid #333;color:#fff;padding:.4rem .8rem;border-radius:6px;cursor:pointer;font-size:.85rem">📥 Exporter CSV</button>':''}</div><div class="order-list">${orders.map(o=>`<div class="order-card">
+<h3>#${o.id} — ${o.name}</h3>
+<div class="info">📅 ${o.date} | 📞 ${o.phone}${o.email?' | ✉️ '+o.email:''}</div>
+<div class="info">📍 ${o.address}${o.notes?' | 📝 '+o.notes:''}</div>
+<div class="info"><span class="status ${o.status}">${o.status==='pending'?'En attente':'Confirmée'}</span> | Total: <strong style="color:#d4a853">${o.total.toLocaleString()} MAD</strong></div>
+<div class="items"><table><tr><th>Produit</th><th>Qté</th><th>Prix</th></tr>${o.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${(i.price*i.qty).toLocaleString()} MAD</td></tr>`).join('')}</table></div>
+<div style="margin-top:.8rem"><button onclick="toggleOrderStatus(${o.id})" style="background:#222;border:1px solid #333;color:#d4a853;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem">${o.status==='pending'?'✓ Confirmer':'↩ Remettre en attente'}</button>
+<button onclick="deleteOrder(${o.id})" style="background:#3a1111;border:1px solid #e74c3c44;color:#e74c3c;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem;margin-left:.5rem">🗑 Supprimer</button></div>
+</div>`).join('')}</div>`;
+container.appendChild(content);
+}
+
+async function toggleOrderStatus(id){
+const o=orders.find(o=>o.id===id);
+if(!o)return;
+const ns=o.status==='pending'?'confirmed':'pending';
+try{
+await fetch(API+'/api/orders',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status:ns})});
+o.status=ns;renderAdminPanel();
+}catch(e){alert('Erreur')}
+}
+
+async function deleteOrder(id){
+if(!confirm('Supprimer cette commande ?'))return;
+try{
+await fetch(API+'/api/orders',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+renderAdminPanel();renderProducts();
+}catch(e){alert('Erreur')}
+}
+
+function getTopProducts(n){
+const sales={};
+orders.forEach(o=>o.items.forEach(i=>{sales[i.name]=(sales[i.name]||0)+i.qty}));
+const sorted=Object.entries(sales).sort((a,b)=>b[1]-a[1]).slice(0,n);
+const max=sorted.length>0?sorted[0][1]:1;
+return sorted.map(([name,qty])=>({name,qty,pct:Math.round(qty/max*100)}));
+}
+
+function getBrandSales(){
+const sales={};
+orders.forEach(o=>o.items.forEach(i=>{sales[i.brand]=(sales[i.brand]||0)+i.qty}));
+const sorted=Object.entries(sales).sort((a,b)=>b[1]-a[1]);
+const max=sorted.length>0?sorted[0][1]:1;
+return sorted.map(([brand,qty])=>({brand,qty,pct:Math.round(qty/max*100)}));
+}
+
+function getSalesTrend(days){
+const map={};
+for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.toLocaleDateString('fr-FR');map[k]={total:0,day:k.slice(0,5)}}
+orders.forEach(o=>{const k=new Date(o.date).toLocaleDateString('fr-FR');if(map[k])map[k].total+=o.total});
+const vals=Object.values(map);
+const max=Math.max(...vals.map(v=>v.total),1);
+return vals.map(v=>({...v,pct:Math.round(v.total/max*100)}));
+}
+
+function showChangePwd(){
+const container=document.getElementById('adminContent');
+container.innerHTML=`<div class="modal-header"><h2>🔑 Changer mot de passe</h2><button class="close-btn" onclick="renderAdminPanel()">&times;</button></div>
+<div style="max-width:400px;margin:0 auto">
+<label style="color:#888;font-size:.9rem">Nouveau mot de passe</label>
+<input type="password" id="newPwd1" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin:.5rem 0">
+<label style="color:#888;font-size:.9rem">Confirmer le mot de passe</label>
+<input type="password" id="newPwd2" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin:.5rem 0">
+<button onclick="changePassword()" style="width:100%;margin-top:1rem;padding:.75rem;background:#d4a853;color:#111;border:none;border-radius:6px;font-weight:700;font-size:1rem;cursor:pointer">Enregistrer</button>
+</div>`;
+}
+async function changePassword(){
+const p1=document.getElementById('newPwd1').value;
+const p2=document.getElementById('newPwd2').value;
+if(!p1||p1.length<4){alert('Minimum 4 caractères');return}
+if(p1!==p2){alert('Les mots de passe ne correspondent pas');return}
+try{
+const r=await fetch(API+'/api/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p1})});
+if(r.ok){alert('Mot de passe changé avec succès !');renderAdminPanel()}
+else{alert('Erreur lors du changement')}
+}catch(e){alert('Erreur de connexion')}
+}
+function showLoginChangePwd(){
+document.getElementById('adminContent').innerHTML=`<div class="modal-header"><h2>🔑 Changer mot de passe</h2><button class="close-btn" onclick="showAdmin()">&times;</button></div>
+<div style="max-width:400px;margin:0 auto">
+<label style="color:#888;font-size:.9rem">Nouveau mot de passe</label>
+<input type="password" id="newPwd1" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin:.5rem 0">
+<label style="color:#888;font-size:.9rem">Confirmer le mot de passe</label>
+<input type="password" id="newPwd2" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin:.5rem 0">
+<button onclick="changePasswordLogin()" style="width:100%;margin-top:1rem;padding:.75rem;background:#d4a853;color:#111;border:none;border-radius:6px;font-weight:700;font-size:1rem;cursor:pointer">Enregistrer</button>
+</div>`;
+}
+async function changePasswordLogin(){
+const p1=document.getElementById('newPwd1').value;
+const p2=document.getElementById('newPwd2').value;
+if(!p1||p1.length<4){alert('Minimum 4 caractères');return}
+if(p1!==p2){alert('Les mots de passe ne correspondent pas');return}
+try{
+const r=await fetch(API+'/api/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p1})});
+if(r.ok){alert('Mot de passe changé avec succès !');showAdmin()}
+else{alert('Erreur lors du changement')}
+}catch(e){alert('Erreur de connexion')}
+}
+function logoutAdmin(){
+adminUnlocked=false;
+document.getElementById('adminModal').classList.remove('active');
+}
+
+function showForgotPassword(){
+document.getElementById('adminContent').innerHTML=`
+<div class="modal-header"><h2>Réinitialisation</h2><button class="close-btn" onclick="showAdmin()">&times;</button></div>
+<div style="max-width:360px;margin:1rem auto">
+<p style="color:#888;margin-bottom:1rem;font-size:.9rem">Entrez votre email administrateur pour recevoir un lien de réinitialisation.</p>
+<input type="email" id="resetEmail" placeholder="Votre email" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem">
+<button onclick="sendResetEmail()" style="width:100%;margin-top:.75rem;padding:.75rem;background:#d4a853;color:#111;border:none;border-radius:6px;font-weight:700;font-size:1rem;cursor:pointer">Envoyer</button>
+</div>`;
+}
+
+let _resetToken = null;
+
+async function sendResetEmail(){
+const email=document.getElementById('resetEmail').value.trim();
+if(!email){alert('Veuillez entrer votre email');return}
+try{
+const r=await fetch(API+'/api/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+const d=await r.json();
+if(d.token){_resetToken=d.token;showResetPassword()}
+else{document.getElementById('adminContent').innerHTML=\`<div style="text-align:center;padding:2rem"><p style="color:#888">\${d.message||'Email envoyé si le compte existe.'}</p><button onclick="showAdmin()" style="margin-top:1rem;padding:.5rem 1rem;background:#222;border:1px solid #333;color:#fff;border-radius:6px;cursor:pointer">Retour</button></div>\`}
+}catch(e){alert('Erreur de connexion')}
+}
+
+function showResetPassword(){
+document.getElementById('adminContent').innerHTML=`
+<div class="modal-header"><h2>Nouveau mot de passe</h2><button class="close-btn" onclick="showAdmin()">&times;</button></div>
+<div style="max-width:360px;margin:1rem auto">
+<label style="color:#888;font-size:.9rem">Nouveau mot de passe</label>
+<input type="password" id="resetPwd1" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin:.5rem 0">
+<label style="color:#888;font-size:.9rem">Confirmer le mot de passe</label>
+<input type="password" id="resetPwd2" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin:.5rem 0">
+<button onclick="submitResetPassword()" style="width:100%;margin-top:1rem;padding:.75rem;background:#d4a853;color:#111;border:none;border-radius:6px;font-weight:700;font-size:1rem;cursor:pointer">Réinitialiser</button>
+</div>`;
+}
+
+async function submitResetPassword(){
+const p1=document.getElementById('resetPwd1').value;
+const p2=document.getElementById('resetPwd2').value;
+if(!p1||p1.length<4){alert('Minimum 4 caractères');return}
+if(p1!==p2){alert('Les mots de passe ne correspondent pas');return}
+try{
+const r=await fetch(API+'/api/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:_resetToken,password:p1})});
+if(r.ok){alert('Mot de passe réinitialisé avec succès !');_resetToken=null;showAdmin()}
+else{const d=await r.json();alert(d.error||'Erreur lors de la réinitialisation')}
+}catch(e){alert('Erreur de connexion')}
+}
+
+function showAdminEmail(){
+document.getElementById('adminContent').innerHTML=`
+<div class="modal-header"><h2>📧 Email administrateur</h2><button class="close-btn" onclick="renderAdminPanel()">&times;</button></div>
+<div style="max-width:400px;margin:1rem auto">
+<p style="color:#888;margin-bottom:1rem;font-size:.9rem">Configurez votre email pour la réinitialisation du mot de passe (ex: bazigherachid@gmail.com).</p>
+<input type="email" id="adminEmail" placeholder="admin@exemple.com" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem">
+<button onclick="updateAdminEmail()" style="width:100%;margin-top:.75rem;padding:.75rem;background:#d4a853;color:#111;border:none;border-radius:6px;font-weight:700;font-size:1rem;cursor:pointer">Enregistrer</button>
+</div>`;
+}
+
+async function updateAdminEmail(){
+const email=document.getElementById('adminEmail').value.trim();
+if(!email){alert('Veuillez entrer un email');return}
+try{
+const r=await fetch(API+'/api/update-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+if(r.ok){alert('Email mis à jour !');renderAdminPanel()}
+else{alert('Erreur')}
+}catch(e){alert('Erreur de connexion')}
+}
+async function exportOrders(){
+if(orders.length===0){alert('Aucune commande à exporter');return}
+let csv='ID,Date,Nom,Téléphone,Email,Adresse,Notes,Total,Statut,Produits\n';
+orders.forEach(o=>{
+const prods=o.items.map(i=>`${i.name} x${i.qty}`).join('; ');
+csv+=`${o.id},"${o.date}","${o.name}","${o.phone}","${o.email||''}","${o.address}","${o.notes||''}",${o.total},${o.status},"${prods}"\n`;
+});
+const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8'});
+const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='commandes_farhani.csv';a.click();
+}
+
+const brands=[...new Set(PERFUMES.map(p=>p.brand))].sort();
+document.getElementById('brandFilter').innerHTML='<option value="">Toutes les marques</option>'+brands.map(b=>`<option value="${b}">${b}</option>`).join('');
+renderProducts();updateCartCount();
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active'))}});
+document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('active')})});
+</script>
+</body>
+</html>
