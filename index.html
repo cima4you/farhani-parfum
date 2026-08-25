@@ -341,7 +341,7 @@ const address=document.getElementById('checkAddress').value.trim();
 const postal=document.getElementById('checkPostal').value.trim();
 if(!name||!phone||!address||!postal){alert('Veuillez remplir les champs obligatoires (*)');return;}
 if(cart.length===0){alert('Votre panier est vide');return;}
-const order={id:Date.now(),date:new Date().toLocaleString('fr-FR'),name,phone,email,address:address+' — CP: '+postal,notes:document.getElementById('checkNotes').value.trim(),items:[...cart],total:cart.reduce((s,i)=>s+i.price*i.qty,0),status:'pending'};
+const order={id:Date.now(),date:new Date().toLocaleString('fr-FR'),name,phone,email,address,postal,notes:document.getElementById('checkNotes').value.trim(),items:[...cart],total:cart.reduce((s,i)=>s+i.price*i.qty,0),status:'pending'};
 try{
 await fetch(API+'/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(order)});
 }catch(e){alert('Erreur d\'envoi de la commande');return}
@@ -461,7 +461,7 @@ content.style.marginTop='1rem';
 content.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><span style="color:#888">${orders.length} commande(s)</span>${orders.length>0?'<button onclick="exportOrders()" style="background:#222;border:1px solid #333;color:#fff;padding:.4rem .8rem;border-radius:6px;cursor:pointer;font-size:.85rem">📥 Exporter CSV</button>':''}</div><div class="order-list">${orders.map(o=>`<div class="order-card">
 <h3>#${o.id} — ${o.name}</h3>
 <div class="info">📅 ${o.date} | 📞 ${o.phone}${o.email?' | ✉️ '+o.email:''}</div>
-<div class="info">📍 ${o.address}${o.notes?' | 📝 '+o.notes:''}</div>
+<div class="info">📍 ${o.address}${o.postal?' | 📮 CP: '+o.postal:''}${o.notes?' | 📝 '+o.notes:''}</div>
 <div class="info"><span class="status ${o.status}">${o.status==='pending'?'En attente':o.status==='cancelled'?'Annulée':'Confirmée'}</span> | Total: <strong style="color:#d4a853">${o.total.toLocaleString()} MAD</strong></div>
 <div class="items"><table><tr><th>Produit</th><th>Qté</th><th>Prix</th></tr>${o.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${(i.price*i.qty).toLocaleString()} MAD</td></tr>`).join('')}</table></div>
 <div style="margin-top:.8rem">${o.status!=='cancelled'?`<button onclick="toggleOrderStatus(${o.id})" style="background:#222;border:1px solid #333;color:#d4a853;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem">${o.status==='pending'?'✓ Confirmer':'✕ Annuler'}</button>`:''}
