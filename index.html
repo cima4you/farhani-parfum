@@ -201,43 +201,27 @@ header{padding:.75rem 1rem;flex-wrap:wrap;gap:.5rem}
 </footer>
 
 <script>
-const PERFUMES = [
-{id:1,name:"Libre Le Parfum",brand:"Yves Saint Laurent",price:1692,desc:"Parfum floral ambré, intense et sophistiqué",cat:"Femme",img:"🌹"},
-{id:2,name:"Libre EDP Intense 50ml",brand:"Yves Saint Laurent",price:1207,desc:"Intensité florale avec lavande et vanille",cat:"Femme",img:"🌺"},
-{id:3,name:"Paradoxe Radical Essence 50ml",brand:"Prada",price:1250,desc:"Un paradoxe floral audacieux et captivant",cat:"Femme",img:"🌸"},
-{id:4,name:"Bad Boy Cobalt Elixir 50ml",brand:"Carolina Herrera",price:888,desc:"Elixir boisé épicé pour homme moderne",cat:"Homme",img:"🪵"},
-{id:5,name:"Si Passione 50ml",brand:"Giorgio Armani",price:1071,desc:"Rose et poire, une passion intense",cat:"Femme",img:"🌹"},
-{id:6,name:"La Petite Robe Noire 30ml",brand:"Guerlain",price:972,desc:"Le charme noir revisité, gourmand et floral",cat:"Femme",img:"🖤"},
-{id:7,name:"This Is Really Her 100ml",brand:"Zadig & Voltaire",price:1367,desc:"Vanille boisée, féminine et moderne",cat:"Femme",img:"✨"},
-{id:8,name:"Bright Crystal 90ml",brand:"Versace",price:1153,desc:"Frais et floral, un éclat de cristal",cat:"Femme",img:"💎"},
-{id:9,name:"Her Parfum 100ml",brand:"Burberry",price:1475,desc:"Un parfum moderne, féminin et audacieux",cat:"Femme",img:"🍓"},
-{id:10,name:"Hypnotic Poison 50ml",brand:"Dior",price:1392,desc:"Le poison envoûtant à l'amande et à la vanille",cat:"Femme",img:"💫"},
-{id:11,name:"Sauvage EDP 60ml",brand:"Dior",price:1250,desc:"Fraîcheur radicale, ambre boisé puissant",cat:"Homme",img:"🌵"},
-{id:12,name:"Bleu de Chanel EDP 50ml",brand:"Chanel",price:1180,desc:"Parfum boisé aromatique intemporel",cat:"Homme",img:"💙"},
-{id:13,name:"Acqua di Gio Profondo 75ml",brand:"Giorgio Armani",price:1090,desc:"Fraîcheur marine profonde et minérale",cat:"Homme",img:"🌊"},
-{id:14,name:"1 Million 100ml",brand:"Paco Rabanne",price:950,desc:"Cuir épicé, audacieux et irrésistible",cat:"Homme",img:"🥇"},
-{id:15,name:"Invictus 100ml",brand:"Paco Rabanne",price:920,desc:"Fraîcheur marine et ambre gris victorieux",cat:"Homme",img:"🏆"},
-{id:16,name:"Good Girl 50ml",brand:"Carolina Herrera",price:1100,desc:"Parfum floral ambré en talon aiguille",cat:"Femme",img:"👠"},
-{id:17,name:"La Nuit Trésor 50ml",brand:"Lancôme",price:1050,desc:"Rose et vanille, un trésor de volupté",cat:"Femme",img:"🌙"},
-{id:18,name:"Black Opium 50ml",brand:"Yves Saint Laurent",price:1150,desc:"Café et vanille, addiction florale",cat:"Femme",img:"☕"},
-{id:19,name:"L'Homme Ideal 100ml",brand:"Guerlain",price:890,desc:"Amande et cuir, l'homme idéal revisité",cat:"Homme",img:"👔"},
-{id:20,name:"Stronger With You 100ml",brand:"Emporio Armani",price:960,desc:"Châtaigne et vanille, parfum de couple",cat:"Homme",img:"❤️"},
-{id:21,name:"J'adore 50ml",brand:"Dior",price:1280,desc:"Bouquet floral emblématique de féminité",cat:"Femme",img:"🌼"},
-{id:22,name:"Angel 50ml",brand:"Mugler",price:1050,desc:"Patchouli et praline, légendaire et gourmand",cat:"Femme",img:"👼"},
-{id:23,name:"Aventus 100ml",brand:"Creed",price:2800,desc:"Ananas et bouleau, mythe masculin",cat:"Homme",img:"🍍"},
-{id:24,name:"Terre d'Hermès 50ml",brand:"Hermès",price:980,desc:"Minéral et boisé, la terre en parfum",cat:"Homme",img:"🌍"},
-{id:25,name:"Flower by Kenzo 50ml",brand:"Kenzo",price:820,desc:"Coquelicot et poudre, féminin poétique",cat:"Femme",img:"🌷"},
-{id:26,name:"Light Blue 50ml",brand:"Dolce & Gabbana",price:890,desc:"Sicile ensoleillée, citron et pomme",cat:"Femme",img:"🍋"},
-{id:27,name:"Le Male Le Parfum 75ml",brand:"Jean Paul Gaultier",price:1050,desc:"Vanille et cardamome, masculin intense",cat:"Homme",img:"💪"},
-{id:28,name:"L'Interdit 50ml",brand:"Givenchy",price:1120,desc:"Tubéreuse et vanille, l'interdit sensuel",cat:"Femme",img:"🚫"},
-{id:29,name:"Pasha Parfum 100ml",brand:"Cartier",price:1600,desc:"Bois précieux, élégance suprême",cat:"Homme",img:"👑"},
-{id:30,name:"Alien 60ml",brand:"Mugler",price:1150,desc:"Ambrette et bois, féminin mystérieux",cat:"Femme",img:"👽"},
-];
+let PERFUMES = [];
 
 const API = '';
 let cart = JSON.parse(localStorage.getItem('farhaniCart')||'[]');
 let orders = [];
 let adminUnlocked = false;
+
+async function loadProducts(){
+try{const r=await fetch(API+'/api/products');PERFUMES=await r.json()}catch(e){PERFUMES=[]}
+renderProducts();initBrands();
+}
+
+function initBrands(){
+const brands=[...new Set(PERFUMES.map(p=>p.brand))].sort();
+document.getElementById('brandFilter').innerHTML='<option value="">Toutes les marques</option>'+brands.map(b=>`<option value="${b}">${b}</option>`).join('');
+}
+
+function renderProductImg(p){
+if(p.img && (p.img.startsWith('http') || p.img.startsWith('data:'))) return `<img src="${p.img}" style="width:100%;height:220px;object-fit:cover">`;
+return p.img || '🌹';
+}
 
 function saveCart(){localStorage.setItem('farhaniCart',JSON.stringify(cart));updateCartCount()}
 
@@ -258,7 +242,7 @@ return;
 grid.innerHTML=filtered.map(p=>{
 const inCart=cart.find(c=>c.id===p.id);
 return `<div class="product-card">
-<div class="product-img">${p.img}</div>
+<div class="product-img">${renderProductImg(p)}</div>
 <div class="product-info">
 <div class="product-brand">${p.brand}</div>
 <div class="product-name">${p.name}</div>
@@ -291,7 +275,7 @@ container.innerHTML='<div class="empty-state"><div class="icon">🛒</div><p>Vot
 return;
 }
 container.innerHTML=cart.map(i=>`<div class="cart-item">
-<div class="cart-item-img">${i.img}</div>
+<div class="cart-item-img">${renderProductImg(i)}</div>
 <div class="cart-item-info">
 <div class="cart-item-name">${i.name}</div>
 <div class="cart-item-price">${i.price.toLocaleString()} MAD</div>
@@ -399,6 +383,7 @@ function renderAdminLayout(container){
 const tabs=`<div class="admin-tabs">
 <button class="admin-tab${_adminTab==='dashboard'?' active':''}" onclick="switchAdminTab('dashboard')">📊 Tableau de bord</button>
 <button class="admin-tab${_adminTab==='orders'?' active':''}" onclick="switchAdminTab('orders')">📦 Commandes (${orders.length})</button>
+<button class="admin-tab${_adminTab==='products'?' active':''}" onclick="switchAdminTab('products')">🧴 Produits</button>
 </div>`;
 const topBtns=`<div style="display:flex;gap:.5rem;flex-wrap:wrap">
 <button onclick="showChangePwd()" style="background:#222;border:1px solid #333;color:#fff;padding:.4rem .8rem;border-radius:6px;cursor:pointer;font-size:.85rem">🔑 Mdp</button>
@@ -407,7 +392,8 @@ const topBtns=`<div style="display:flex;gap:.5rem;flex-wrap:wrap">
 </div>`;
 container.innerHTML=tabs+topBtns;
 if(_adminTab==='dashboard')renderDashboard(container);
-else renderOrdersList(container);
+else if(_adminTab==='orders')renderOrdersList(container);
+else renderProductsAdmin(container);
 }
 
 function switchAdminTab(tab){
@@ -668,9 +654,68 @@ const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8'});
 const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='commandes_farhani.csv';a.click();
 }
 
-const brands=[...new Set(PERFUMES.map(p=>p.brand))].sort();
-document.getElementById('brandFilter').innerHTML='<option value="">Toutes les marques</option>'+brands.map(b=>`<option value="${b}">${b}</option>`).join('');
-renderProducts();updateCartCount();
+function renderProductsAdmin(container){
+const content=document.createElement('div');
+content.style.marginTop='1rem';
+content.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem"><span style="color:#888">${PERFUMES.length} produit(s)</span><button onclick="showProductForm()" style="background:#d4a853;color:#111;padding:.5rem 1rem;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:.9rem">+ Ajouter un produit</button></div><div class="order-list">${PERFUMES.map(p=>`<div class="order-card" style="display:flex;gap:1rem;align-items:center">
+<div style="width:80px;height:80px;border-radius:8px;background:#1e1e1e;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">${renderProductImg(p)}</div>
+<div style="flex:1">
+<h3 style="margin-bottom:.3rem">${p.name}</h3>
+<div class="info" style="margin-bottom:.2rem">${p.brand} — ${p.cat}</div>
+<div class="info">${p.desc}</div>
+<div style="color:#d4a853;font-weight:700;margin-top:.3rem">${p.price.toLocaleString()} MAD</div>
+</div>
+<div style="display:flex;gap:.5rem;flex-shrink:0">
+<button onclick="showProductForm(${p.id})" style="background:#222;border:1px solid #333;color:#fff;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem">✏️</button>
+<button onclick="deleteProductAdmin(${p.id})" style="background:#3a1111;border:1px solid #e74c3c44;color:#e74c3c;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem">🗑</button>
+</div>
+</div>`).join('')}</div>`;
+container.appendChild(content);
+}
+
+function showProductForm(editId){
+const p=editId?PERFUMES.find(x=>x.id===editId):null;
+document.getElementById('adminContent').innerHTML=`
+<div class="modal-header"><h2>${p?'✏️ Modifier':'➕ Ajouter'} un produit</h2><button class="close-btn" onclick="switchAdminTab('products')">&times;</button></div>
+<div style="max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:1rem">
+<div><label style="color:#888;font-size:.85rem">Nom du produit</label><input id="pName" value="${p?p.name:''}" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin-top:.3rem"></div>
+<div><label style="color:#888;font-size:.85rem">Marque</label><input id="pBrand" value="${p?p.brand:''}" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin-top:.3rem"></div>
+<div><label style="color:#888;font-size:.85rem">Description</label><input id="pDesc" value="${p?p.desc:''}" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin-top:.3rem"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem"><div><label style="color:#888;font-size:.85rem">Prix (MAD)</label><input id="pPrice" type="number" value="${p?p.price:''}" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin-top:.3rem"></div>
+<div><label style="color:#888;font-size:.85rem">Catégorie</label><select id="pCat" style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin-top:.3rem"><option value="Femme" ${p&&p.cat==='Femme'?'selected':''}>Femme</option><option value="Homme" ${p&&p.cat==='Homme'?'selected':''}>Homme</option></select></div></div>
+<div><label style="color:#888;font-size:.85rem">Image (Emoji ou URL)</label><input id="pImg" value="${p?p.img:''}" placeholder="🌹 ou https://..." style="width:100%;padding:.75rem;border:1px solid #333;border-radius:6px;background:#1a1a1a;color:#fff;font-size:1rem;margin-top:.3rem"></div>
+<div id="pImgPreview" style="text-align:center;font-size:3rem;min-height:60px;display:flex;align-items:center;justify-content:center">${p?renderProductImg(p):''}</div>
+<button onclick="saveProduct(${editId||'null'})" style="width:100%;padding:.75rem;background:#d4a853;color:#111;border:none;border-radius:6px;font-weight:700;font-size:1rem;cursor:pointer">Enregistrer</button>
+</div>`;
+document.getElementById('pImg').addEventListener('input',e=>{
+const v=e.target.value;
+document.getElementById('pImgPreview').innerHTML=v?(v.startsWith('http')||v.startsWith('data:')?`<img src="${v}" style="max-height:60px;border-radius:8px">`:v):'';
+});
+}
+
+async function saveProduct(editId){
+const name=document.getElementById('pName').value.trim();
+const brand=document.getElementById('pBrand').value.trim();
+const desc=document.getElementById('pDesc').value.trim();
+const price=parseInt(document.getElementById('pPrice').value);
+const cat=document.getElementById('pCat').value;
+const img=document.getElementById('pImg').value.trim();
+if(!name||!brand||!price){alert('Remplissez au moins le nom, la marque et le prix');return}
+if(editId){
+await fetch(API+'/api/products',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:editId,name,brand,desc,price,cat,img})});
+}else{
+await fetch(API+'/api/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,brand,desc,price,cat,img})});
+}
+await loadProducts();switchAdminTab('products');
+}
+
+async function deleteProductAdmin(id){
+if(!confirm('Supprimer ce produit ?'))return;
+await fetch(API+'/api/products',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+await loadProducts();switchAdminTab('products');
+}
+
+loadProducts();updateCartCount();
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active'))}});
 document.querySelectorAll('.modal').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('active')})});
