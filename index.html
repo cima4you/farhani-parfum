@@ -500,10 +500,11 @@ const max=sorted.length>0?sorted[0][1]:1;
 return sorted.map(([brand,qty])=>({brand,qty,pct:Math.round(qty/max*100)}));
 }
 
+function parseDate(str){const p=str.split(' ')[0].split('/');return new Date(p[2],p[1]-1,p[0])}
 function getSalesTrend(days){
 const map={};
 for(let i=days-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.toLocaleDateString('fr-FR');map[k]={total:0,day:k.slice(0,5)}}
-orders.forEach(o=>{const k=new Date(o.date).toLocaleDateString('fr-FR');if(map[k])map[k].total+=o.total});
+orders.forEach(o=>{try{const k=parseDate(o.date).toLocaleDateString('fr-FR');if(map[k])map[k].total+=o.total}catch(e){}});
 const vals=Object.values(map);
 const max=Math.max(...vals.map(v=>v.total),1);
 return vals.map(v=>({...v,pct:Math.round(v.total/max*100)}));
