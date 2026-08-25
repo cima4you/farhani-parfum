@@ -23,6 +23,16 @@ export default async function handler(req, res) {
       }
       return res.json({ success: true });
     }
+    case 'PUT': {
+      const { id, items, total } = req.body;
+      const sid = String(id).replace(/\.0$/, '');
+      const rows = await client.execute('SELECT id FROM orders');
+      const match = rows.rows.find(r => String(r.id).replace(/\.0$/, '') === sid);
+      if (match) {
+        await client.execute('UPDATE orders SET items = ?, total = ? WHERE id = ?', [JSON.stringify(items), total, match.id]);
+      }
+      return res.json({ success: true });
+    }
     case 'DELETE': {
       const { id } = req.body;
       const sid = String(id).replace(/\.0$/, '');

@@ -463,7 +463,7 @@ content.innerHTML=`<div style="display:flex;justify-content:space-between;align-
 <div class="info">📅 ${o.date} | 📞 ${o.phone}${o.email?' | ✉️ '+o.email:''}</div>
 <div class="info">📍 ${o.address}${o.postal?' | 📮 CP: '+o.postal:''}${o.notes?' | 📝 '+o.notes:''}</div>
 <div class="info"><span class="status ${o.status}">${o.status==='pending'?'En attente':o.status==='cancelled'?'Annulée':'Confirmée'}</span> | Total: <strong style="color:#d4a853">${o.total.toLocaleString()} MAD</strong></div>
-<div class="items"><table><tr><th>Produit</th><th>Qté</th><th>Prix</th></tr>${o.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${(i.price*i.qty).toLocaleString()} MAD</td></tr>`).join('')}</table></div>
+<div class="items"><table><tr><th>Produit</th><th>Qté</th><th>Prix</th><th></th></tr>${o.items.map((it,idx)=>`<tr><td>${it.name}</td><td><div style="display:flex;align-items:center;gap:.3rem"><button onclick="changeOrderItem(${o.id},${idx},-1)" style="background:#222;border:1px solid #333;color:#fff;width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:.8rem">−</button><span>${it.qty}</span><button onclick="changeOrderItem(${o.id},${idx},1)" style="background:#222;border:1px solid #333;color:#fff;width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:.8rem">+</button></div></td><td>${(it.price*it.qty).toLocaleString()} MAD</td><td><button onclick="removeOrderItem(${o.id},${idx})" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:.9rem">✕</button></td></tr>`).join('')}</table></div>
 <div style="margin-top:.8rem">${o.status!=='cancelled'?`<button onclick="toggleOrderStatus(${o.id})" style="background:#222;border:1px solid #333;color:#d4a853;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem">${o.status==='pending'?'✓ Confirmer':'✕ Annuler'}</button>`:''}
 <button onclick="deleteOrder(${o.id})" style="background:#3a1111;border:1px solid #e74c3c44;color:#e74c3c;padding:.4rem .8rem;border-radius:4px;cursor:pointer;font-size:.85rem;margin-left:.5rem">🗑 Supprimer</button></div>
 </div>`).join('')}</div>`;
@@ -486,6 +486,35 @@ try{
 await fetch(API+'/api/orders',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:Number(id)})});
 renderAdminPanel();renderProducts();
 }catch(e){alert('Erreur')}
+}
+
+async function changeOrderItem(orderId,idx,delta){
+const o=orders.find(o=>Number(o.id)===Number(orderId));
+if(!o)return;
+o.items[idx].qty+=delta;
+if(o.items[idx].qty<=0)o.items.splice(idx,1);
+const total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
+if(o.items.length===0){
+if(!confirm('Supprimer cette commande ?')){renderAdminPanel();return}
+await fetch(API+'/api/orders',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:Number(orderId)})});
+}else{
+await fetch(API+'/api/orders',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:Number(orderId),items:o.items,total})});
+}
+renderAdminPanel();renderProducts();
+}
+
+async function removeOrderItem(orderId,idx){
+const o=orders.find(o=>Number(o.id)===Number(orderId));
+if(!o)return;
+o.items.splice(idx,1);
+const total=o.items.reduce((s,i)=>s+i.price*i.qty,0);
+if(o.items.length===0){
+if(!confirm('Supprimer cette commande ?')){renderAdminPanel();return}
+await fetch(API+'/api/orders',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:Number(orderId)})});
+}else{
+await fetch(API+'/api/orders',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:Number(orderId),items:o.items,total})});
+}
+renderAdminPanel();renderProducts();
 }
 
 function getTopProducts(n){
