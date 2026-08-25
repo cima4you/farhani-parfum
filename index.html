@@ -405,8 +405,7 @@ function renderDashboard(container){
 const confirmed=orders.filter(o=>o.status==='confirmed');
 const pending=orders.filter(o=>o.status==='pending');
 const cancelled=orders.filter(o=>o.status==='cancelled');
-const totalRev=orders.reduce((s,o)=>s+o.total,0);
-const confirmedRev=confirmed.reduce((s,o)=>s+o.total,0);
+const totalRev=confirmed.reduce((s,o)=>s+o.total,0);
 
 container.innerHTML+=`<div class="dash-grid">
 <div class="dash-card revenue"><div class="icon">💰</div><div class="value">${totalRev.toLocaleString()} <span style="font-size:.8rem;color:#888">MAD</span></div><div class="label">Chiffre d'affaires total</div></div>
